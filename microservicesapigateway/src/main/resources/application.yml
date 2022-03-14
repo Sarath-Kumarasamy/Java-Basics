@@ -1,0 +1,30 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: Order-service
+        uri: lb://Order-Service
+        predicates:
+        - Path=/order/**
+        filters :
+        - name : CircuitBreaker
+          args : 
+           name : Order-Fallback
+           fallbackuri : forward:/orderfallback
+      - id: Payment-service
+        uri: lb://Payment-Service
+        predicates:
+        - Path=/**
+        filters :
+        - name : CircuitBreaker
+          args :
+           name : Payment-Fallback
+           fallbackuri : forward:/paymentfallback
+
+hystrix :
+ command :
+  fallbackcmd :
+   execution :
+    isolation :
+     thread :
+      timeoutInMilliseconds : 5000
